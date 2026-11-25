@@ -1,0 +1,169 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Teacher Dashboard — NS Classes{% endblock %}
+{% block page_title %}Faculty Console{% endblock %}
+{% block page_subtitle %}Welcome, {{ user.get_full_name|default:user.username }}{% endblock %}
+
+{% block dashboard_body %}
+
+<!-- Quick Stats Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div>
+                <small class="text-muted text-uppercase fw-bold">My Batches</small>
+                <h3 class="fw-bold mb-0 text-dark">{{ assigned_batches.count }}</h3>
+                <small class="text-primary"><i class="bi bi-collection-fill"></i> Assigned Courses</small>
+            </div>
+            <div class="metric-icon bg-primary-subtle text-primary">
+                <i class="bi bi-collection-fill"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div>
+                <small class="text-muted text-uppercase fw-bold">Students Taught</small>
+                <h3 class="fw-bold mb-0 text-dark">{{ total_students }}</h3>
+                <small class="text-success"><i class="bi bi-people-fill"></i> Enrolled in Batches</small>
+            </div>
+            <div class="metric-icon bg-success-subtle text-success">
+                <i class="bi bi-people-fill"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="metric-card">
+            <div>
+                <small class="text-muted text-uppercase fw-bold">Study Notes Uploaded</small>
+                <h3 class="fw-bold mb-0 text-dark">{{ uploaded_materials.count }}</h3>
+                <small class="text-warning"><i class="bi bi-file-earmark-pdf-fill"></i> Materials</small>
+            </div>
+            <div class="metric-icon bg-warning-subtle text-warning">
+                <i class="bi bi-folder-fill"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Teacher Schedule & Actions -->
+<div class="row g-4 mb-4">
+    <!-- Today's Schedule -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history text-danger me-2"></i>Today's Classes ({{ current_day }})</h5>
+                <span class="badge bg-danger">{{ today_timetable.count }} Lecture(s)</span>
+            </div>
+
+            {% for slot in today_timetable %}
+                <div class="timetable-slot">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="badge bg-primary fw-bold">{{ slot.subject.name }}</span>
+                        <strong class="text-danger">{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</strong>
+                    </div>
+                    <div class="fw-bold text-dark">{{ slot.batch.name }}</div>
+                    <small class="text-muted d-block mt-1">Room: {{ slot.room|default:"Main Hall" }}</small>
+                </div>
+            {% empty %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-calendar-check fs-2 text-muted d-block mb-1"></i>
+                    <p class="small mb-0">No classes scheduled for today.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Assigned Batches & Attendance Action -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-check2-square text-success me-2"></i>Mark Attendance</h5>
+                <a href="{% url 'attendance:mark' %}" class="btn btn-sm btn-success rounded-pill px-3">Mark Now</a>
+            </div>
+            
+            <p class="text-muted small">Select an assigned batch to take daily student attendance:</p>
+            <div class="list-group list-group-flush">
+                {% for b in assigned_batches %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3">
+                        <div>
+                            <h6 class="mb-0 fw-bold text-dark">{{ b.name }}</h6>
+                            <small class="text-muted">{{ b.get_board_display }} • Class {{ b.class_level }} ({{ b.current_students }} students)</small>
+                        </div>
+                        <a href="{% url 'attendance:mark' %}?batch={{ b.id }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                            <i class="bi bi-pencil-square me-1"></i> Attendance
+                        </a>
+                    </div>
+                {% empty %}
+                    <p class="text-muted small">No batches currently assigned.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Study Notes & Recent Broadcasts -->
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-file-earmark-arrow-up text-primary me-2"></i>My Uploaded Notes</h5>
+                <a href="{% url 'materials:upload' %}" class="btn btn-sm btn-primary rounded-pill"><i class="bi bi-plus-circle me-1"></i> Upload</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Title</th>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mat in uploaded_materials %}
+                            <tr>
+                                <td class="fw-bold">{{ mat.title }}</td>
+                                <td>{{ mat.subject.name }}</td>
+                                <td>{{ mat.upload_date|date:"d M" }}</td>
+                                <td>
+                                    <a href="{{ mat.file.url }}" target="_blank" class="btn btn-sm btn-light border px-2 py-1"><i class="bi bi-download"></i></a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-3">No uploaded notes yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-megaphone-fill text-warning me-2"></i>Recent Announcements</h5>
+                <a href="{% url 'announcements:create' %}" class="btn btn-sm btn-warning rounded-pill fw-bold"><i class="bi bi-plus-circle me-1"></i> New Notice</a>
+            </div>
+            {% for ann in announcements %}
+                <div class="p-3 bg-light rounded-3 border mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h6 class="mb-0 fw-bold text-dark">{{ ann.title }}</h6>
+                        <span class="badge {% if ann.priority == 'urgent' %}bg-danger{% elif ann.priority == 'important' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                            {{ ann.get_priority_display }}
+                        </span>
+                    </div>
+                    <p class="text-muted small mb-0">{{ ann.description }}</p>
+                    <small class="text-secondary d-block mt-1">{{ ann.date|date:"d M Y" }}</small>
+                </div>
+            {% empty %}
+                <p class="text-center text-muted py-3">No announcements posted.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

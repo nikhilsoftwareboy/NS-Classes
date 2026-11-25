@@ -1,0 +1,56 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Notices & Announcements — NS Classes{% endblock %}
+{% block page_title %}Announcements & Notice Board{% endblock %}
+{% block page_subtitle %}Official announcements, exam schedules, and holiday notices{% endblock %}
+
+{% block dashboard_body %}
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0">Active Notices ({{ announcements.count }})</h5>
+        {% if can_create %}
+            <a href="{% url 'announcements:create' %}" class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm">
+                <i class="bi bi-plus-circle me-1"></i> Post Announcement
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="row g-4">
+        {% for ann in announcements %}
+            <div class="col-lg-6">
+                <div class="card border rounded-4 p-4 h-100 shadow-sm position-relative">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge {% if ann.priority == 'urgent' %}bg-danger{% elif ann.priority == 'important' %}bg-warning text-dark{% else %}bg-secondary{% endif %} text-uppercase px-3 py-1">
+                            {{ ann.get_priority_display }}
+                        </span>
+                        <small class="text-muted"><i class="bi bi-calendar-event me-1"></i>{{ ann.date|date:"d F Y" }}</small>
+                    </div>
+
+                    <h5 class="fw-bold text-dark mb-2">{{ ann.title }}</h5>
+                    <p class="text-secondary small mb-3 flex-grow-1">{{ ann.description }}</p>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top small text-muted">
+                        <div>
+                            <span class="badge bg-light text-dark border me-1">
+                                Audience: {{ ann.get_target_audience_display }}
+                                {% if ann.batch %}({{ ann.batch.name }}){% endif %}
+                            </span>
+                        </div>
+                        {% if can_create %}
+                            <a href="{% url 'announcements:delete' ann.pk %}" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete Notice">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5 text-muted">
+                <i class="bi bi-megaphone fs-1 d-block mb-2"></i>
+                <p>No active announcements currently posted.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

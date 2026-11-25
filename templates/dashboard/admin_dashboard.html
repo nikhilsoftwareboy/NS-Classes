@@ -1,0 +1,298 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Director & Admin Dashboard — NS Classes{% endblock %}
+{% block page_title %}Director Management Dashboard{% endblock %}
+{% block page_subtitle %}Directors: {{ SITE_DIRECTOR }} | Overview & Analytics{% endblock %}
+
+{% block dashboard_body %}
+
+<!-- 1. Top Metrics Cards (Requirement 21) -->
+<div class="row g-4 mb-4">
+    <!-- Total Students -->
+    <div class="col-xl-3 col-md-6">
+        <div class="metric-card">
+            <div>
+                <small class="text-muted text-uppercase fw-bold">Total Students</small>
+                <h3 class="fw-bold mb-0 text-dark">{{ total_students }}</h3>
+                <small class="text-success"><i class="bi bi-person-check-fill"></i> Active Enrolled</small>
+            </div>
+            <div class="metric-icon bg-primary-subtle text-primary">
+                <i class="bi bi-people-fill"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Teachers -->
+    <div class="col-xl-3 col-md-6">
+        <div class="metric-card">
+            <div>
+                <small class="text-muted text-uppercase fw-bold">Faculty Teachers</small>
+                <h3 class="fw-bold mb-0 text-dark">{{ total_teachers }}</h3>
+                <small class="text-info"><i class="bi bi-mortarboard-fill"></i> Teaching Staff</small>
+            </div>
+            <div class="metric-icon bg-info-subtle text-info">
+                <i class="bi bi-person-video3"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Batches -->
+    <div class="col-xl-3 col-md-6">
+        <div class="metric-card">
+            <div>
+                <small class="text-muted text-uppercase fw-bold">Active Batches</small>
+                <h3 class="fw-bold mb-0 text-dark">{{ total_batches }}</h3>
+                <small class="text-secondary"><i class="bi bi-diagram-3-fill"></i> CBSE Batches</small>
+            </div>
+            <div class="metric-icon bg-success-subtle text-success">
+                <i class="bi bi-collection-fill"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Courses -->
+    <div class="col-xl-3 col-md-6">
+        <div class="metric-card">
+            <div>
+                <small class="text-muted text-uppercase fw-bold">Total Courses</small>
+                <h3 class="fw-bold mb-0 text-dark">{{ total_courses }}</h3>
+                <small class="text-primary"><i class="bi bi-book-half"></i> Class 6 - 12</small>
+            </div>
+            <div class="metric-icon bg-warning-subtle text-warning">
+                <i class="bi bi-journal-bookmark-fill"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Second Row Metrics (Attendance, Pending Fees, Enquiries, Notices) -->
+<div class="row g-4 mb-4">
+    <!-- Today Attendance -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Today's Attendance</span>
+                <span class="badge bg-primary">Today</span>
+            </div>
+            <h4 class="fw-bold text-dark mb-1">{{ today_present_count }} / {{ today_attendance_count }} Present</h4>
+            <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: {% if today_attendance_count > 0 %}{% widthratio today_present_count today_attendance_count 100 %}{% else %}0{% endif %}%;"></div>
+            </div>
+            <div class="mt-2 text-end">
+                <a href="{% url 'attendance:mark' %}" class="small text-decoration-none">Mark Attendance &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Fees -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Pending Fees Total</span>
+                <span class="badge bg-danger">{{ pending_fee_records }} Pending</span>
+            </div>
+            <h4 class="fw-bold text-danger mb-1">₹{{ pending_fees_total }}</h4>
+            <small class="text-muted">Collected: <strong class="text-success">₹{{ total_collected }}</strong></small>
+            <div class="mt-1 text-end">
+                <a href="{% url 'fees:list' %}" class="small text-decoration-none">Manage Fees &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Enquiries -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">New Enquiries</span>
+                <span class="badge bg-warning text-dark">Need Followup</span>
+            </div>
+            <h4 class="fw-bold text-dark mb-1">{{ new_enquiries_count }} New Enquiries</h4>
+            <small class="text-muted">{{ unread_messages_count }} unread contact messages</small>
+            <div class="mt-1 text-end">
+                <a href="{% url 'enquiries:list' %}" class="small text-decoration-none">Review Enquiries &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Director Actions -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Quick Actions</span>
+                <span class="badge bg-dark">Director</span>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{% url 'students:create' %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-circle me-1"></i> Add Student</a>
+                <a href="{% url 'batches:create' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-plus-circle me-1"></i> New Batch</a>
+                <a href="{% url 'timetable:create' %}" class="btn btn-sm btn-outline-info"><i class="bi bi-plus-circle me-1"></i> Schedule</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Charts & Schedule Row -->
+<div class="row g-4 mb-4">
+    <!-- Fee Collection & Enrolment Chart -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-graph-up text-primary me-2"></i>Fee & Enrolment Overview</h5>
+                <span class="badge bg-light text-dark border">Institute Summary</span>
+            </div>
+            <div style="height: 280px;">
+                <canvas id="adminAnalyticsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Class Schedule -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-calendar-event text-danger me-2"></i>Today's Classes ({{ current_day }})</h5>
+                <a href="{% url 'timetable:index' %}" class="small text-decoration-none">Full Timetable</a>
+            </div>
+
+            <div class="overflow-auto" style="max-height: 270px;">
+                {% for slot in today_classes %}
+                    <div class="timetable-slot">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge bg-primary-subtle text-primary fw-bold">{{ slot.subject.name }}</span>
+                            <small class="text-muted fw-bold">{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</small>
+                        </div>
+                        <div class="small fw-semibold text-dark">{{ slot.batch.name }}</div>
+                        <small class="text-muted d-flex justify-content-between mt-1">
+                            <span><i class="bi bi-person me-1"></i>{{ slot.teacher.full_name|default:"TBA" }}</span>
+                            <span><i class="bi bi-geo-alt me-1"></i>{{ slot.room|default:"Room 1" }}</span>
+                        </small>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-calendar-check fs-2 text-muted d-block mb-1"></i>
+                        <p class="small mb-0">No classes scheduled for today.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. Recent Tables Row (Admissions & Enquiries) -->
+<div class="row g-4">
+    <!-- Recent Student Admissions -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-person-plus-fill text-success me-2"></i>Recent Student Admissions</h5>
+                <a href="{% url 'students:list' %}" class="btn btn-sm btn-outline-primary rounded-pill">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Board / Class</th>
+                            <th>Batch</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for st in recent_students %}
+                            <tr>
+                                <td class="fw-bold">{{ st.student_id }}</td>
+                                <td>{{ st.full_name }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ st.get_board_display }} - {{ st.class_level }}</span></td>
+                                <td>{{ st.batch.name|default:"Unassigned"|truncatechars:18 }}</td>
+                                <td>
+                                    <a href="{% url 'students:detail' st.pk %}" class="btn btn-sm btn-light border px-2 py-1"><i class="bi bi-eye"></i></a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted py-3">No student records yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Admission Enquiries -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-chat-dots-fill text-warning me-2"></i>Recent Admission Enquiries</h5>
+                <a href="{% url 'enquiries:list' %}" class="btn btn-sm btn-outline-warning rounded-pill text-dark">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Phone</th>
+                            <th>Board/Class</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enq in recent_enquiries %}
+                            <tr>
+                                <td class="fw-bold">{{ enq.student_name }}</td>
+                                <td><a href="tel:{{ enq.phone }}" class="text-decoration-none">{{ enq.phone }}</a></td>
+                                <td>{{ enq.get_board_display }} - {{ enq.class_level }}</td>
+                                <td>
+                                    {% if enq.status == 'new' %}<span class="badge bg-warning text-dark">New</span>
+                                    {% elif enq.status == 'contacted' %}<span class="badge bg-info">Contacted</span>
+                                    {% elif enq.status == 'admitted' %}<span class="badge bg-success">Admitted</span>
+                                    {% else %}<span class="badge bg-secondary">{{ enq.get_status_display }}</span>{% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'students:create' %}?enquiry={{ enq.pk }}" class="btn btn-sm btn-success px-2 py-1 me-1" title="Enroll Student"><i class="bi bi-person-plus-fill"></i></a>
+                                    <a href="{% url 'enquiries:list' %}" class="btn btn-sm btn-light border px-2 py-1"><i class="bi bi-pencil-square"></i></a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted py-3">No enquiries yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('adminAnalyticsChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Total Expected Fee', 'Fee Collected', 'Pending Fees'],
+                datasets: [{
+                    label: 'Amount in INR (₹)',
+                    data: [{{ total_collected }} + {{ pending_fees_total }}, {{ total_collected }}, {{ pending_fees_total }}],
+                    backgroundColor: ['#0f3460', '#2b9348', '#e94560'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

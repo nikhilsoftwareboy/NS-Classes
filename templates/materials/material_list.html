@@ -1,0 +1,117 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Study Materials — NS Classes{% endblock %}
+{% block page_title %}Study Notes & Material Repository{% endblock %}
+{% block page_subtitle %}PDF Notes, Assignments, Question Papers, and Solution Sets{% endblock %}
+
+{% block dashboard_body %}
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+    <!-- Filter -->
+    <form method="GET" class="row g-3 align-items-center mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="q" value="{{ q }}" class="form-control bg-light"
+                    placeholder="Search by title, chapter...">
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <select name="type" class="form-select bg-light" onchange="this.form.submit()">
+                <option value="">All Types</option>
+                <option value="notes" {% if selected_type=='notes' %}selected{% endif %}>PDF Notes</option>
+                <option value="assignment" {% if selected_type=='assignment' %}selected{% endif %}>Assignment</option>
+                <option value="practice" {% if selected_type=='practice' %}selected{% endif %}>Practice Paper</option>
+                <option value="important" {% if selected_type=='important' %}selected{% endif %}>Important Questions
+                </option>
+                <option value="sample" {% if selected_type=='sample' %}selected{% endif %}>Sample Paper</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <select name="board" class="form-select bg-light" onchange="this.form.submit()">
+                <option value="">All Boards</option>
+                <option value="CBSE" selected>CBSE</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <select name="class" class="form-select bg-light" onchange="this.form.submit()">
+                <option value="">All Classes</option>
+                <option value="6" {% if selected_class=='6' %}selected{% endif %}>Class 6</option>
+                <option value="7" {% if selected_class=='7' %}selected{% endif %}>Class 7</option>
+                <option value="8" {% if selected_class=='8' %}selected{% endif %}>Class 8</option>
+                <option value="9" {% if selected_class=='9' %}selected{% endif %}>Class 9</option>
+                <option value="10" {% if selected_class=='10' %}selected{% endif %}>Class 10</option>
+                <option value="11" {% if selected_class=='11' %}selected{% endif %}>Class 11</option>
+                <option value="12" {% if selected_class=='12' %}selected{% endif %}>Class 12</option>
+            </select>
+        </div>
+        <div class="col-lg-3 col-md-12 text-lg-end">
+            {% if can_upload %}
+            <a href="{% url 'materials:upload' %}" class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm">
+                <i class="bi bi-upload me-1"></i> Upload Study Material
+            </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Title & Description</th>
+                    <th>Type</th>
+                    <th>Subject</th>
+                    <th>Board / Class</th>
+                    <th>Target Batch</th>
+                    <th>Uploaded By</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mat in materials %}
+                <tr>
+                    <td>
+                        <div class="fw-bold text-dark">{{ mat.title }}</div>
+                        {% if mat.description %}
+                        <small class="text-muted">{{ mat.description|truncatewords:8 }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-secondary-subtle text-dark border">{{ mat.get_material_type_display }}</span>
+                    </td>
+                    <td><span class="badge bg-primary fw-semibold">{{ mat.subject.name }}</span></td>
+                    <td>
+                        {% if mat.board %}
+                        <span
+                            class="badge {% if mat.board == 'CBSE' %}bg-info text-dark{% else %}bg-success{% endif %}">
+                            {{ mat.get_board_display }} - Class {{ mat.class_level }}
+                        </span>
+                        {% else %}
+                        <span class="badge bg-light text-dark border">Class {{ mat.class_level|default:"All" }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ mat.batch.name|default:"All Batches" }}</td>
+                    <td><small>{{ mat.uploaded_by.get_full_name|default:mat.uploaded_by.username|default:"NS Classes" }}</small></td>
+                    <td><small>{{ mat.upload_date|date:"d M Y" }}</small></td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{{ mat.file.url }}" target="_blank" class="btn btn-primary" download
+                                title="Download"><i class="bi bi-download"></i> Download</a>
+                            {% if can_upload %}
+                            <a href="{% url 'materials:delete' mat.pk %}" class="btn btn-outline-danger"
+                                title="Delete"><i class="bi bi-trash"></i></a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-5">No study materials found matching filters.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

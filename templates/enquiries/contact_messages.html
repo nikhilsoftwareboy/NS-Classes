@@ -1,0 +1,65 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Contact Messages — NS Classes{% endblock %}
+{% block page_title %}Contact Form Inquiries{% endblock %}
+
+{% block dashboard_body %}
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+    <h5 class="fw-bold text-dark mb-4">Received Messages ({{ contact_msgs.count }})</h5>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Email / Phone</th>
+                    <th>Subject</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for msg in contact_msgs %}
+                    <tr class="{% if not msg.is_read %}table-warning{% endif %}">
+                        <td><small>{{ msg.created_at|date:"d M Y, g:i A" }}</small></td>
+                        <td class="fw-bold text-dark">{{ msg.name }}</td>
+                        <td>
+                            <div><a href="mailto:{{ msg.email }}">{{ msg.email }}</a></div>
+                            {% if msg.phone %}
+                                <small class="text-muted"><a href="tel:{{ msg.phone }}">{{ msg.phone }}</a></small>
+                            {% endif %}
+                        </td>
+                        <td class="fw-semibold">{{ msg.subject }}</td>
+                        <td><small>{{ msg.message }}</small></td>
+                        <td>
+                            {% if msg.is_read %}
+                                <span class="badge bg-secondary">Read</span>
+                            {% else %}
+                                <span class="badge bg-danger">Unread</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1 justify-content-end">
+                                <a href="{% url 'enquiries:toggle_read' msg.pk %}" class="btn btn-sm btn-outline-primary">
+                                    {% if msg.is_read %}Mark Unread{% else %}Mark Read{% endif %}
+                                </a>
+                                <form method="POST" action="{% url 'enquiries:delete_message' msg.pk %}" class="d-inline" onsubmit="return confirm('Delete message from {{ msg.name }}?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Message">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="text-center text-muted py-5">No contact messages received yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

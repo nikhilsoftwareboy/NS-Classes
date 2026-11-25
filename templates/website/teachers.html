@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Our Faculty & Teachers — NS Classes{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="py-5 text-white" style="background: var(--primary-gradient);">
+    <div class="container text-center py-4">
+        <span class="badge bg-warning text-dark px-3 py-2 fw-bold mb-2">OUR EDUCATORS</span>
+        <h1 class="fw-bold mb-2">Meet Our Experienced Faculty</h1>
+        <p class="lead text-light mb-0 mx-auto" style="max-width: 650px;">
+            Subject matter experts with a proven track record in coaching CBSE Board toppers.
+        </p>
+    </div>
+</div>
+
+<div class="container section-padding">
+    <div class="row g-4">
+        {% for teacher in teachers %}
+        <div class="col-lg-4 col-md-6">
+            <div class="teacher-card">
+                <div class="teacher-img-wrap" style="height: 250px;">
+                    {% if teacher.photo %}
+                    <img src="{{ teacher.photo.url }}" alt="{{ teacher.full_name }}">
+                    {% else %}
+                    <i class="bi bi-person-fill fs-1"></i>
+                    {% endif %}
+                </div>
+                <div class="p-4">
+                    <h4 class="fw-bold text-dark mb-1">{{ teacher.full_name }}</h4>
+                    <p class="text-danger fw-semibold small mb-2">{{ teacher.qualification }}</p>
+                    <p class="text-muted small mb-3"><i class="bi bi-briefcase-fill text-warning me-1"></i> {{ teacher.experience }}+ Years of Teaching Experience</p>
+
+                    <p class="text-secondary small mb-3">
+                        {{ teacher.bio|default:"Dedicated faculty guiding students towards excellence in board examinations and conceptual clarity." }}
+                    </p>
+
+                    <div class="mb-3">
+                        <small class="text-muted d-block fw-semibold mb-1">Subject Specialization:</small>
+                        <div class="d-flex flex-wrap justify-content-center gap-1">
+                            {% for sub in teacher.specialization.all %}
+                            <span class="badge bg-primary-subtle text-primary border small">{{ sub.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5 text-muted">
+            <p>Faculty list being updated.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

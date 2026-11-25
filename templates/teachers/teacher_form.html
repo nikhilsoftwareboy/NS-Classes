@@ -1,0 +1,91 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ title }} — NS Classes{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_subtitle %}Manage teacher profile and portal access{% endblock %}
+
+{% block dashboard_body %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">Account & Identity</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Teacher ID *</label>
+                        {{ form.teacher_id }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Photo</label>
+                        {{ form.photo }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">First Name *</label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Last Name *</label>
+                        {{ form.last_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Email Address *</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Mobile Number *</label>
+                        {{ form.phone }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Portal Username</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Portal Password</label>
+                        {{ form.password }}
+                        <small class="text-muted">{% if is_edit %}Leave blank to keep unchanged{% else %}Default: teacher@123{% endif %}</small>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">Professional Credentials</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Qualification *</label>
+                        {{ form.qualification }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Experience (Years) *</label>
+                        {{ form.experience }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Subject Specialization</label>
+                        {{ form.specialization }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Joining Date *</label>
+                        {{ form.joining_date }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Short Bio / Overview</label>
+                        {{ form.bio }}
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            {{ form.is_active }}
+                            <label class="form-check-label fw-semibold ms-2" for="{{ form.is_active.id_for_label }}">Active Faculty Status</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a href="{% url 'teachers:list' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary fw-bold rounded-pill px-5 shadow">
+                        <i class="bi bi-save me-2"></i> Save Teacher Record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Attendance Report — NS Classes{% endblock %}
+{% block page_title %}Batch Attendance Analytics & Report{% endblock %}
+
+{% block dashboard_body %}
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+    <form method="GET" class="row g-3 align-items-center mb-4">
+        <div class="col-md-8">
+            <select name="batch" class="form-select bg-light" onchange="this.form.submit()">
+                <option value="">-- Select Batch to Generate Report --</option>
+                {% for b in batches %}
+                    <option value="{{ b.id }}" {% if selected_batch.id == b.id %}selected{% endif %}>
+                        {{ b.name }} ({{ b.get_board_display }} - Class {{ b.class_level }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'attendance:mark' %}" class="btn btn-outline-primary rounded-pill">
+                <i class="bi bi-pencil-square me-1"></i> Mark Attendance
+            </a>
+        </div>
+    </form>
+
+    {% if selected_batch %}
+        <div class="alert alert-light border rounded-3 p-3 mb-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="fw-bold mb-0 text-dark">{{ selected_batch.name }}</h5>
+                <small class="text-muted">{{ selected_batch.get_board_display }} • Class {{ selected_batch.class_level }}</small>
+            </div>
+            <span class="badge bg-primary fs-6">{{ student_stats|length }} Students</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Total Classes</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                        <th>Attendance %</th>
+                        <th>Status Indicator</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in student_stats %}
+                        <tr>
+                            <td class="fw-bold">{{ item.student.student_id }}</td>
+                            <td>{{ item.student.full_name }}</td>
+                            <td>{{ item.total }}</td>
+                            <td class="text-success fw-bold">{{ item.present }}</td>
+                            <td class="text-danger fw-bold">{{ item.absent }}</td>
+                            <td>
+                                <span class="badge {% if item.percentage >= 75 %}bg-success{% elif item.percentage >= 60 %}bg-warning text-dark{% else %}bg-danger{% endif %} fs-6">
+                                    {{ item.percentage }}%
+                                </span>
+                            </td>
+                            <td>
+                                <div class="progress" style="height: 6px; width: 120px;">
+                                    <div class="progress-bar {% if item.percentage >= 75 %}bg-success{% elif item.percentage >= 60 %}bg-warning{% else %}bg-danger{% endif %}" style="width: {{ item.percentage }}%;"></div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="7" class="text-center text-muted py-4">No attendance records found for this batch.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-center text-muted py-5">Please select a batch from above to view attendance report.</p>
+    {% endif %}
+</div>
+{% endblock %}

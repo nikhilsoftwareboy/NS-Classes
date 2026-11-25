@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Frequently Asked Questions — NS Classes{% endblock %}
+
+{% block content %}
+<div class="py-5 text-white" style="background: var(--primary-gradient);">
+    <div class="container text-center py-4">
+        <span class="badge bg-warning text-dark px-3 py-2 fw-bold mb-2">HELP & CLARIFICATION</span>
+        <h1 class="fw-bold mb-2">Frequently Asked Questions</h1>
+        <p class="lead text-light mb-0 mx-auto" style="max-width: 650px;">
+            Find quick answers regarding our coaching batches, fees, board curricula, and timetables.
+        </p>
+    </div>
+</div>
+
+<div class="container section-padding">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="accordion accordion-flush bg-white rounded-4 shadow-sm border p-4" id="faqAccordion">
+                {% for faq in faqs %}
+                <div class="accordion-item mb-3 border rounded-3 overflow-hidden">
+                    <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %} fw-bold"
+                            type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}">
+                            {{ faq.question }}
+                        </button>
+                    </h2>
+                    <div id="collapse{{ forloop.counter }}"
+                        class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+                        data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-secondary">
+                            {{ faq.answer }}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="accordion-item mb-3 border rounded-3">
+                    <h2 class="accordion-header"><button class="accordion-button fw-bold">What is the curriculum
+                            followed at NS Classes?</button></h2>
+                    <div class="accordion-collapse collapse show">
+                        <div class="accordion-body">NS Classes strictly follows the CBSE curriculum with NCERT
+                            alignment, conceptual theory lectures, regular assessments, and dedicated doubt-clearing
+                            sessions.</div>
+                    </div>
+                </div>
+                <div class="accordion-item mb-3 border rounded-3">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-bold">What is the batch
+                            size at NS Classes?</button></h2>
+                    <div class="accordion-collapse collapse">
+                        <div class="accordion-body">We maintain limited student capacities (25-30 students) per batch to
+                            ensure individual attention and doubt solving.</div>
+                    </div>
+                </div>
+                <div class="accordion-item mb-3 border rounded-3">
+                    <h2 class="accordion-header"><button class="accordion-button collapsed fw-bold">How can students
+                            access timetables and study notes?</button></h2>
+                    <div class="accordion-collapse collapse">
+                        <div class="accordion-body">Students are provided individual login accounts to our portal
+                            dashboard where they can check their assigned batch timetable, attendance, download PDF
+                            notes, and view announcements.</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

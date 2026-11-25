@@ -1,0 +1,432 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}NS Classes — Premier Coaching for CBSE Board | Directors: Nikhil Kumar Singh & Saurabh Raj{% endblock %}
+
+{% block content %}
+
+<!-- 1. HERO SECTION -->
+<section class="hero-section">
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-7">
+                <div class="hero-badges">
+                    <span class="badge-cbse"><i class="bi bi-award-fill me-1"></i> CBSE Board (Class 6 - 12)</span>
+                </div>
+                <h1 class="hero-title">
+                    Welcome to <span class="hero-highlight">{{ SITE_NAME }}</span>
+                </h1>
+                <p class="fs-4 text-warning fw-bold mb-2">
+                    "{{ SITE_TAGLINE }}"
+                </p>
+                <p class="hero-lead">
+                    NS Classes provides quality education and preparation for students of CBSE Board. Our goal is to provide proper guidance, structured learning, regular practice, and academic support to help students achieve their goals.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    <a href="{% url 'website:courses' %}" class="btn btn-warning btn-lg fw-bold rounded-pill px-4 shadow">
+                        <i class="bi bi-mortarboard me-2"></i> Explore Courses
+                    </a>
+                    <a href="{% url 'website:admission' %}" class="btn btn-danger btn-lg fw-bold rounded-pill px-4 shadow">
+                        <i class="bi bi-pencil-square me-2"></i> Join Now
+                    </a>
+                    <a href="{% url 'website:contact' %}" class="btn btn-outline-light btn-lg rounded-pill px-4">
+                        <i class="bi bi-telephone-outbound me-2"></i> Contact Us
+                    </a>
+                </div>
+                <div class="d-flex align-items-center gap-4 mt-5 text-light small">
+                    <div><i class="bi bi-check-circle-fill text-success me-1"></i> Dedicated Batches</div>
+                    <div><i class="bi bi-check-circle-fill text-success me-1"></i> Timetable Tracking</div>
+                    <div><i class="bi bi-check-circle-fill text-success me-1"></i> Complete Study Notes</div>
+                </div>
+            </div>
+
+            <!-- Hero Quick Admission Card -->
+            <div class="col-lg-5">
+                <div class="hero-card">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-secondary">
+                        <h4 class="text-white fw-bold mb-0"><i class="bi bi-journal-plus text-warning me-2"></i>Quick Admission</h4>
+                        <span class="badge bg-danger">Open 2026-27</span>
+                    </div>
+                    <p class="text-light small mb-3">Reserve your seat in our high-performance CBSE Board batches.</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="admission_submit" value="1">
+                        <div class="mb-2">
+                            <label class="form-label text-light small mb-1">Student Name *</label>
+                            {{ admission_form.student_name }}
+                        </div>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <label class="form-label text-light small mb-1">Mobile No *</label>
+                                {{ admission_form.phone }}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label text-light small mb-1">Board *</label>
+                                {{ admission_form.board }}
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label text-light small mb-1">Class *</label>
+                                {{ admission_form.class_level }}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label text-light small mb-1">Parent's Name *</label>
+                                {{ admission_form.parent_name }}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 fw-bold py-2 rounded-pill shadow">
+                            <i class="bi bi-send-fill me-1"></i> Submit Enquiry Now
+                        </button>
+                    </form>
+                    <div class="text-center mt-3 text-light small">
+                        <span>Or call directly: <a href="tel:{{ SITE_PHONE }}" class="text-warning fw-bold">+91 {{ SITE_PHONE }}</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 2. ABOUT NS CLASSES & DIRECTOR'S MESSAGE -->
+<section class="section-padding bg-white">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="section-tag">About Our Institute</span>
+                <h2 class="section-title">Building Strong Academic Foundations for Future Leaders</h2>
+                <p class="lead text-muted">
+                    NS Classes is a dedicated educational institute focused on providing quality academic education to students. We provide preparation for <strong>CBSE Board students</strong>. Our objective is to create a strong academic foundation and help students achieve excellent results.
+                </p>
+                <p class="text-secondary">
+                    With structured daily lecture plans, experienced faculty, dedicated batches for CBSE Board, individual doubt clearing, and weekly assessment tests, we ensure every student excels in school and board exams.
+                </p>
+                <div class="row g-3 mt-2">
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3 border">
+                            <i class="bi bi-award fs-2 text-danger"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold">100% Board Focus</h6>
+                                <small class="text-muted">CBSE Syllabus</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3 border">
+                            <i class="bi bi-clock-history fs-2 text-primary"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Dedicated Batches</h6>
+                                <small class="text-muted">Disciplined Timetables</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Director Card -->
+            <div class="col-lg-6">
+                <div class="director-card">
+                    <i class="bi bi-quote director-quote-icon"></i>
+                    <span class="badge bg-danger mb-3 px-3 py-2">Directors' Desk</span>
+                    <h4 class="fw-bold text-dark mb-1">Nikhil Kumar Singh &amp; Saurabh Raj</h4>
+                    <p class="text-primary fw-semibold small mb-3">Directors &amp; Academic Heads, NS Classes</p>
+                    <blockquote class="text-secondary fst-italic mb-4">
+                        "At NS Classes, our mission is to make quality academic coaching accessible, disciplined, and results-oriented for CBSE Board students. We believe every student has unique potential. Through dedicated mentorship, concept-first teaching, and continuous practice, we prepare our students to top their board examinations and build glorious futures."
+                    </blockquote>
+                    <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                        <div>
+                            <small class="text-muted d-block">Directors Helpline</small>
+                            <a href="tel:{{ SITE_PHONE }}" class="text-dark fw-bold text-decoration-none">
+                                <i class="bi bi-telephone-fill text-danger me-1"></i> +91 {{ SITE_PHONE }}
+                            </a>
+                        </div>
+                        <a href="{% url 'website:about' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">Read Full Message</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. WHY CHOOSE US (Requirement 19: 10 Core Cards) -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="text-center">
+            <span class="section-tag">Why NS Classes</span>
+            <h2 class="section-title">Why Parents & Students Choose Us</h2>
+            <p class="section-subtitle">A comprehensive academic ecosystem tailored for maximum score and concept clarity.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- 1. Experienced Teachers -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="bi bi-person-check-fill"></i></div>
+                    <h5 class="fw-bold mb-2">Experienced Teachers</h5>
+                    <p class="text-muted small mb-0">Expert faculty with deep command over CBSE Board patterns and syllabus.</p>
+                </div>
+            </div>
+            <!-- 2. CBSE Board Prep -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="bi bi-book-half"></i></div>
+                    <h5 class="fw-bold mb-2">CBSE Board Preparation</h5>
+                    <p class="text-muted small mb-0">Targeted teaching matching the specific textbooks, language, and marking schemes of CBSE Board.</p>
+                </div>
+            </div>
+            <!-- 3. Regular Classes -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="bi bi-calendar2-check-fill"></i></div>
+                    <h5 class="fw-bold mb-2">Regular Classes</h5>
+                    <p class="text-muted small mb-0">Consistent, on-schedule daily lectures ensuring timely syllabus completion with revision.</p>
+                </div>
+            </div>
+            <!-- 4. Dedicated Batches -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="bi bi-diagram-3-fill"></i></div>
+                    <h5 class="fw-bold mb-2">Dedicated Batches</h5>
+                    <p class="text-muted small mb-0">Dedicated batches for each class with structured schedules and disciplined timetables.</p>
+                </div>
+            </div>
+            <!-- 5. Regular Tests -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="bi bi-clipboard-data-fill"></i></div>
+                    <h5 class="fw-bold mb-2">Regular Tests</h5>
+                    <p class="text-muted small mb-0">Weekly chapter tests, monthly assessments, and full-length mock board examinations.</p>
+                </div>
+            </div>
+            <!-- 6. Study Materials -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+                    <h5 class="fw-bold mb-2">Study Materials</h5>
+                    <p class="text-muted small mb-0">High-quality printed and downloadable PDF notes, formula sheets, and practice question sets.</p>
+                </div>
+            </div>
+            <!-- 7. Personal Attention -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="bi bi-people-fill"></i></div>
+                    <h5 class="fw-bold mb-2">Personal Attention</h5>
+                    <p class="text-muted small mb-0">Optimized batch capacity so every student receives individual care and academic guidance.</p>
+                </div>
+            </div>
+            <!-- 8. Performance Tracking -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                    <h5 class="fw-bold mb-2">Performance Tracking</h5>
+                    <p class="text-muted small mb-0">Regular progress tracking, attendance monitoring, and feedback reports for parents.</p>
+                </div>
+            </div>
+            <!-- 9. Doubt Support & Affordable -->
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-box">
+                    <div class="feature-icon"><i class="bi bi-patch-question-fill"></i></div>
+                    <h5 class="fw-bold mb-2">Doubt Support & Affordable</h5>
+                    <p class="text-muted small mb-0">Dedicated doubt removal sessions and highly reasonable fee structures for all families.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. CBSE PREPARATION SECTION -->
+<section class="section-padding bg-white">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4">
+            <div>
+                <span class="section-tag bg-info text-dark">Central Board</span>
+                <h2 class="section-title mb-1">CBSE Board Preparation (Class 6 - 12)</h2>
+                <p class="text-muted mb-0">NCERT aligned concepts, high-scoring techniques, science, mathematics, and language proficiency.</p>
+            </div>
+            <a href="{% url 'website:courses' %}?board=CBSE" class="btn btn-outline-primary rounded-pill px-4 mt-3 mt-md-0">View All CBSE Courses <i class="bi bi-arrow-right"></i></a>
+        </div>
+
+        <div class="row g-4">
+            {% for course in cbse_courses %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="course-card position-relative">
+                        <span class="course-badge-board bg-primary text-white">CBSE • Class {{ course.class_level }}</span>
+                        <div class="course-img-wrap">
+                            {% if course.image %}
+                                <img src="{{ course.image.url }}" alt="{{ course.name }}">
+                            {% else %}
+                                <div class="text-center p-3">
+                                    <i class="bi bi-mortarboard fs-1 text-warning d-block mb-1"></i>
+                                    <span class="fw-bold">Class {{ course.class_level }} CBSE</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="p-4 d-flex flex-column flex-grow-1">
+                            <h5 class="fw-bold text-dark mb-2">{{ course.name }}</h5>
+                            <p class="text-muted small mb-3 flex-grow-1">{{ course.description|truncatewords:18 }}</p>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted d-block fw-semibold mb-1">Subjects Covered:</small>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for sub in course.subjects.all|slice:":4" %}
+                                        <span class="badge bg-light text-dark border">{{ sub.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                                <div>
+                                    <small class="text-muted d-block">Course Fee</small>
+                                    <span class="fw-bold text-primary fs-5">₹{{ course.fees }}</span>
+                                </div>
+                                <a href="{% url 'website:course_detail' course.pk %}" class="btn btn-sm btn-primary rounded-pill px-3">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-4 text-muted">
+                    <p>CBSE Courses are being updated. Check back shortly!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 6. DYNAMIC STATISTICS SECTION (Requirement 20) -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-3 col-6">
+                <div class="stat-item">
+                    <div class="stat-number counter-value" data-target="{{ stats.total_students }}">{{ stats.total_students }}+</div>
+                    <div class="stat-label">Students Enrolled</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="stat-item">
+                    <div class="stat-number counter-value" data-target="{{ stats.total_teachers }}">{{ stats.total_teachers }}+</div>
+                    <div class="stat-label">Expert Teachers</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="stat-item">
+                    <div class="stat-number counter-value" data-target="{{ stats.total_courses }}">{{ stats.total_courses }}+</div>
+                    <div class="stat-label">Courses Offered</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-6">
+                <div class="stat-item">
+                    <div class="stat-number counter-value" data-target="{{ stats.total_batches }}">{{ stats.total_batches }}+</div>
+                    <div class="stat-label">Active Batches</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 7. OUR FACULTY / TEACHERS PREVIEW -->
+<section class="section-padding bg-white">
+    <div class="container">
+        <div class="text-center">
+            <span class="section-tag">Dedicated Educators</span>
+            <h2 class="section-title">Meet Our Expert Faculty</h2>
+            <p class="section-subtitle">Passionate teachers dedicated to conceptual clarity and student success.</p>
+        </div>
+
+        <div class="row g-4">
+            {% for teacher in teachers %}
+                <div class="col-lg-3 col-md-6">
+                    <div class="teacher-card">
+                        <div class="teacher-img-wrap">
+                            {% if teacher.photo %}
+                                <img src="{{ teacher.photo.url }}" alt="{{ teacher.full_name }}">
+                            {% else %}
+                                <i class="bi bi-person-fill"></i>
+                            {% endif %}
+                        </div>
+                        <div class="p-3">
+                            <h5 class="fw-bold mb-1">{{ teacher.full_name }}</h5>
+                            <p class="text-danger small fw-semibold mb-2">{{ teacher.qualification }}</p>
+                            <p class="text-muted small mb-2"><i class="bi bi-briefcase-fill text-warning me-1"></i> {{ teacher.experience }}+ Years Teaching</p>
+                            <div class="d-flex flex-wrap justify-content-center gap-1">
+                                {% for sub in teacher.specialization.all|slice:":3" %}
+                                    <span class="badge bg-secondary-subtle text-dark border small">{{ sub.name }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center text-muted">
+                    <p>Teacher profiles available in the faculty section.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{% url 'website:teachers' %}" class="btn btn-outline-primary rounded-pill px-4">View All Teachers & Faculty <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+
+<!-- 8. STUDENT TESTIMONIALS SECTION -->
+<section class="section-padding bg-light">
+    <div class="container">
+        <div class="text-center">
+            <span class="section-tag">Student Success</span>
+            <h2 class="section-title">What Our Students & Parents Say</h2>
+            <p class="section-subtitle">Real experiences and feedback from students at NS Classes.</p>
+        </div>
+
+        <div class="row g-4">
+            {% for t in testimonials %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="ns-card p-4 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="text-warning mb-2">
+                                {% for i in "12345"|make_list %}
+                                    <i class="bi bi-star-fill"></i>
+                                {% endfor %}
+                            </div>
+                            <p class="text-secondary fst-italic mb-3">"{{ t.review }}"</p>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 pt-3 border-top">
+                            <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 44px; height: 44px;">
+                                {{ t.student_name|make_list|first }}
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold text-dark">{{ t.student_name }}</h6>
+                                <small class="text-muted">{{ t.course_class }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center text-muted">
+                    <p>Testimonials will appear here.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 10. ADMISSION CALL TO ACTION -->
+<section class="py-5 text-white" style="background: linear-gradient(135deg, #e94560, #533483);">
+    <div class="container text-center py-4">
+        <h2 class="fw-bold mb-3">Ready to Score High in CBSE Board Exams?</h2>
+        <p class="lead mb-4 mx-auto" style="max-width: 650px;">
+            Join NS Classes today. Limited seats available per batch to maintain personal student attention.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{% url 'website:admission' %}" class="btn btn-warning btn-lg fw-bold rounded-pill px-5 shadow">
+                <i class="bi bi-pencil-square me-2"></i> Enroll Now
+            </a>
+            <a href="tel:{{ SITE_PHONE }}" class="btn btn-outline-light btn-lg rounded-pill px-5">
+                <i class="bi bi-telephone-fill me-2"></i> Call: +91 {{ SITE_PHONE }}
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

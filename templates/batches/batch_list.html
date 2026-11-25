@@ -1,0 +1,93 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Batches Management — NS Classes{% endblock %}
+{% block page_title %}Batch Management System{% endblock %}
+{% block page_subtitle %}CBSE Board Batches{% endblock %}
+
+{% block dashboard_body %}
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+    <!-- Filter -->
+    <form method="GET" class="row g-3 align-items-center mb-4">
+        <div class="col-md-4">
+            <select name="board" class="form-select bg-light" onchange="this.form.submit()">
+                <option value="">All CBSE Batches</option>
+                <option value="CBSE" selected>CBSE Batches</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select name="status" class="form-select bg-light" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+                <option value="upcoming" {% if selected_status == 'upcoming' %}selected{% endif %}>Upcoming</option>
+                <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+            </select>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if user.is_superuser or user.profile.role == 'admin' %}
+                <a href="{% url 'batches:create' %}" class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Create New Batch
+                </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Batch Name</th>
+                    <th>Board / Class</th>
+                    <th>Course</th>
+                    <th>Teacher In-Charge</th>
+                    <th>Duration</th>
+                    <th>Capacity / Enrolled</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in batches %}
+                    <tr>
+                        <td class="fw-bold text-primary">{{ b.name }}</td>
+                        <td>
+                            <span class="badge {% if b.board == 'CBSE' %}bg-info text-dark{% else %}bg-success{% endif %}">
+                                {{ b.get_board_display }} - Class {{ b.class_level }}
+                            </span>
+                        </td>
+                        <td>{{ b.course.name|truncatechars:20 }}</td>
+                        <td>{{ b.teacher.full_name|default:"Faculty Assigned" }}</td>
+                        <td><small>{{ b.start_date|date:"d M" }} - {{ b.end_date|date:"d M Y" }}</small></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge {% if b.is_full %}bg-danger{% else %}bg-secondary{% endif %}">
+                                    {{ b.current_students }} / {{ b.max_students }}
+                                </span>
+                                <div class="progress flex-grow-1" style="height: 6px; width: 60px;">
+                                    <div class="progress-bar {% if b.is_full %}bg-danger{% else %}bg-success{% endif %}" style="width: {% widthratio b.current_students b.max_students 100 %}%;"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge {% if b.status == 'active' %}bg-success{% elif b.status == 'upcoming' %}bg-warning text-dark{% else %}bg-secondary{% endif %} text-capitalize">
+                                {{ b.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'batches:detail' b.pk %}" class="btn btn-outline-primary" title="Manage Batch"><i class="bi bi-people-fill"></i> View</a>
+                                {% if user.is_superuser or user.profile.role == 'admin' %}
+                                    <a href="{% url 'batches:update' b.pk %}" class="btn btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                    <a href="{% url 'batches:delete' b.pk %}" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="8" class="text-center text-muted py-5">No batches created yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

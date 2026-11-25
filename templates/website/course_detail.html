@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ course.name }} — NS Classes{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5 text-white" style="background: var(--primary-gradient);">
+    <div class="container py-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'website:home' %}" class="text-white-50">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'website:courses' %}" class="text-white-50">Courses</a></li>
+                <li class="breadcrumb-item active text-white" aria-current="page">{{ course.name }}</li>
+            </ol>
+        </nav>
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
+            <span class="badge {% if course.board == 'CBSE' %}bg-primary{% else %}bg-success{% endif %} fs-6 px-3 py-2">
+                {{ course.get_board_display }} • Class {{ course.class_level }}
+            </span>
+            <span class="badge bg-warning text-dark fs-6 px-3 py-2">Duration: {{ course.duration }}</span>
+        </div>
+        <h1 class="fw-bold mb-0">{{ course.name }}</h1>
+    </div>
+</div>
+
+<div class="container section-padding">
+    <div class="row g-5">
+        <!-- Left: Course Overview & Batches -->
+        <div class="col-lg-8">
+            <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border mb-4">
+                <h4 class="fw-bold text-dark mb-3"><i class="bi bi-info-circle-fill text-primary me-2"></i>Course Overview</h4>
+                <p class="text-secondary fs-6 leading-relaxed mb-4">
+                    {{ course.description }}
+                </p>
+
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-book-half text-danger me-2"></i>Curriculum & Subjects Included</h5>
+                <div class="row g-3 mb-4">
+                    {% for sub in course.subjects.all %}
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3 border d-flex align-items-center gap-3">
+                                <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                                    <i class="bi {{ sub.icon|default:'bi-journal-check' }} fs-5"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-dark">{{ sub.name }}</h6>
+                                    <small class="text-muted">Code: {{ sub.code }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">Subjects specified in the curriculum syllabus.</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Active Batches for this Course -->
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar3 text-success me-2"></i>Available Batches</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Batch Name</th>
+                                <th>Teacher In-Charge</th>
+                                <th>Schedule / Duration</th>
+                                <th>Capacity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for batch in batches %}
+                                <tr>
+                                    <td class="fw-bold text-primary">{{ batch.name }}</td>
+                                    <td>{{ batch.teacher.full_name|default:"Assigned Faculty" }}</td>
+                                    <td><small>{{ batch.start_date|date:"d M Y" }} to {{ batch.end_date|date:"d M Y" }}</small></td>
+                                    <td>
+                                        <span class="badge {% if batch.is_full %}bg-danger{% else %}bg-secondary{% endif %}">
+                                            {{ batch.current_students }} / {{ batch.max_students }} seats
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success text-capitalize">{{ batch.status }}</span>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">New batches are being scheduled for this course. Inquire now!</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Enrollment Card -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg rounded-4 sticky-top" style="top: 100px;">
+                <div class="card-header bg-primary text-white p-4 rounded-top-4 text-center">
+                    <small class="text-white-50 text-uppercase fw-bold">Admission & Fees</small>
+                    <h2 class="fw-bold mb-0 text-warning mt-1">₹{{ course.fees }}</h2>
+                    <small class="text-light">Comprehensive package with study notes & tests</small>
+                </div>
+                <div class="card-body p-4">
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-success"></i> <span>Daily Live Classes</span></li>
+                        <li class="mb-2 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-success"></i> <span>Printed / PDF Study Materials</span></li>
+                        <li class="mb-2 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-success"></i> <span>Weekly Chapter Assessment Tests</span></li>
+                        <li class="mb-2 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-success"></i> <span>Personal Doubt Clearing by Faculty</span></li>
+                        <li class="mb-2 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-success"></i> <span>Board Pattern Mock Exams</span></li>
+                    </ul>
+
+                    <a href="{% url 'website:admission' %}?course={{ course.name }}" class="btn btn-warning w-100 fw-bold py-3 rounded-pill shadow mb-2">
+                        <i class="bi bi-pencil-square me-2"></i> Enroll In This Course
+                    </a>
+                    <a href="tel:{{ SITE_PHONE }}" class="btn btn-outline-dark w-100 rounded-pill py-2">
+                        <i class="bi bi-telephone-fill me-2 text-danger"></i> Speak to Director (+91 {{ SITE_PHONE }})
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Student Dashboard — NS Classes{% endblock %}
+{% block page_title %}Student Portal{% endblock %}
+{% block page_subtitle %}Welcome back, {{ user.get_full_name|default:user.username }}!{% endblock %}
+
+{% block dashboard_body %}
+
+<!-- 1. Profile & Identity Banner -->
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4 text-white" style="background: var(--primary-gradient);">
+    <div class="row align-items-center g-4">
+        <div class="col-md-auto text-center">
+            <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold fs-1 shadow mx-auto" style="width: 90px; height: 90px;">
+                {% if student.photo %}
+                    <img src="{{ student.photo.url }}" class="w-100 h-100 rounded-circle object-fit-cover">
+                {% else %}
+                    {{ user.first_name|default:user.username|make_list|first|upper }}
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                <span class="badge bg-warning text-dark fw-bold px-3 py-1">Student ID: {{ student.student_id|default:"NS-STU-TEMP" }}</span>
+                {% if student.roll_number %}
+                    <span class="badge bg-light text-dark px-3 py-1">Roll No: {{ student.roll_number }}</span>
+                {% endif %}
+                <span class="badge bg-info text-dark px-3 py-1">{{ student.get_board_display|default:"CBSE Board" }} • Class {{ student.class_level|default:"N/A" }}</span>
+            </div>
+            <h3 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h3>
+            <p class="text-light mb-0 small">
+                <i class="bi bi-mortarboard-fill text-warning me-1"></i> Course: <strong>{{ student.course.name|default:"General Preparation" }}</strong> | 
+                <i class="bi bi-collection-fill text-info me-1"></i> Batch: <strong>{{ student.batch.name|default:"Batch Assignment Pending" }}</strong>
+            </p>
+        </div>
+        <div class="col-md-auto text-md-end">
+            <a href="tel:{{ SITE_PHONE }}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                <i class="bi bi-telephone-fill text-warning me-1"></i> Helpline: +91 {{ SITE_PHONE }}
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Academic Stats Row (Attendance & Fee Summary) -->
+<div class="row g-4 mb-4">
+    <!-- Attendance Card -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-calendar2-check-fill text-success me-2"></i>My Attendance Overview</h5>
+                <span class="badge {% if attendance_pct >= 75 %}bg-success{% else %}bg-danger{% endif %} fs-6 px-3 py-1">
+                    {{ attendance_pct }}% Attendance
+                </span>
+            </div>
+
+            <div class="row g-3 text-center my-2">
+                <div class="col-4">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <small class="text-muted d-block text-uppercase fw-bold">Total Classes</small>
+                        <h4 class="fw-bold mb-0 text-dark">{{ total_classes }}</h4>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-3 bg-success-subtle rounded-3 border border-success-subtle">
+                        <small class="text-success d-block text-uppercase fw-bold">Present</small>
+                        <h4 class="fw-bold mb-0 text-success">{{ present_classes }}</h4>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle">
+                        <small class="text-danger d-block text-uppercase fw-bold">Absent</small>
+                        <h4 class="fw-bold mb-0 text-danger">{{ absent_classes }}</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress mt-3" style="height: 10px;">
+                <div class="progress-bar {% if attendance_pct >= 75 %}bg-success{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ attendance_pct }}%;"></div>
+            </div>
+            <small class="text-muted mt-2 d-block text-end">Requirement: Min 75% for Board Exam Endorsement</small>
+        </div>
+    </div>
+
+    <!-- Fee Status Card -->
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100" id="fee-section">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-cash-stack text-primary me-2"></i>Fee Records &amp; Status</h5>
+                {% if fee_records.first %}
+                    <span class="badge {% if fee_records.first.status == 'paid' %}bg-success{% elif fee_records.first.status == 'partial' %}bg-warning text-dark{% else %}bg-danger{% endif %} text-uppercase px-3 py-1">
+                        {{ fee_records.first.get_status_display }}
+                    </span>
+                {% else %}
+                    <span class="badge bg-secondary">No Records</span>
+                {% endif %}
+            </div>
+
+            {% if fee_records %}
+                {% for fee in fee_records %}
+                    <div class="p-3 bg-light rounded-3 border mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong class="text-dark">Receipt No: {{ fee.receipt_number }}</strong>
+                                <small class="text-muted d-block">{{ fee.payment_date|default:fee.created_at|date:"d M Y" }} ({{ fee.get_payment_method_display|default:"Online Payment" }})</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'fees:receipt' fee.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3" target="_blank">
+                                    <i class="bi bi-receipt me-1"></i> View Receipt
+                                </a>
+                                {% if fee.remaining_amount > 0 %}
+                                    <a href="{% url 'fees:pay' fee.pk %}" class="btn btn-sm btn-success fw-bold rounded-pill px-3 shadow-sm">
+                                        <i class="bi bi-credit-card-fill me-1"></i> Pay Now
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between small">
+                            <span>Total: <strong>₹{{ fee.total_fee }}</strong></span>
+                            <span class="text-success">Paid: <strong>₹{{ fee.paid_amount }}</strong></span>
+                            <span class="text-danger">Due: <strong>₹{{ fee.remaining_amount }}</strong></span>
+                        </div>
+                        {% if fee.remaining_amount > 0 %}
+                            <div class="mt-3 pt-2 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i> Due Amount: ₹{{ fee.remaining_amount }}
+                                </span>
+                                <a href="{% url 'fees:pay' fee.pk %}" class="btn btn-sm btn-success fw-bold rounded-pill px-3 shadow-sm">
+                                    <i class="bi bi-lightning-fill me-1"></i> Pay ₹{{ fee.remaining_amount }} Online Now
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="mt-2 pt-2 border-top text-success small fw-semibold">
+                                <i class="bi bi-check-circle-fill me-1"></i> All fees fully paid. Thank you!
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-4 text-muted">
+                    <p class="mb-0">No fee record generated yet. Contact administration.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- 3. Batch Timetable -->
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-calendar3 text-danger me-2"></i>My Batch Timetable ({{ student.batch.name|default:"All" }})</h5>
+                <span class="badge bg-dark">{{ batch_timetable.count }} Classes/Week</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Subject</th>
+                            <th>Teacher</th>
+                            <th>Room</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for slot in batch_timetable %}
+                            <tr>
+                                <td class="fw-bold text-primary">{{ slot.day }}</td>
+                                <td>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ slot.subject.name }}</span></td>
+                                <td>{{ slot.teacher.full_name|default:"Faculty" }}</td>
+                                <td>{{ slot.room|default:"Room 1" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted py-4">Timetable entries are being updated for your batch.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Student Database — NS Classes{% endblock %}
+{% block page_title %}Student Database Management{% endblock %}
+{% block page_subtitle %}Total Registered Students: {{ total_count }}{% endblock %}
+
+{% block dashboard_body %}
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+    <!-- Search & Filter Controls (Requirement 7) -->
+    <form method="GET" class="row g-3 align-items-center mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="q" value="{{ q }}" class="form-control bg-light" placeholder="Search name, ID, mobile, father...">
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <select name="board" class="form-select bg-light" onchange="this.form.submit()">
+                <option value="">All Boards</option>
+                <option value="CBSE" selected>CBSE</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-6">
+            <select name="class" class="form-select bg-light" onchange="this.form.submit()">
+                <option value="">All Classes</option>
+                <option value="6" {% if selected_class == '6' %}selected{% endif %}>Class 6</option>
+                <option value="7" {% if selected_class == '7' %}selected{% endif %}>Class 7</option>
+                <option value="8" {% if selected_class == '8' %}selected{% endif %}>Class 8</option>
+                <option value="9" {% if selected_class == '9' %}selected{% endif %}>Class 9</option>
+                <option value="10" {% if selected_class == '10' %}selected{% endif %}>Class 10</option>
+                <option value="11" {% if selected_class == '11' %}selected{% endif %}>Class 11</option>
+                <option value="12" {% if selected_class == '12' %}selected{% endif %}>Class 12</option>
+            </select>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <select name="batch" class="form-select bg-light" onchange="this.form.submit()">
+                <option value="">All Batches</option>
+                {% for b in batches %}
+                    <option value="{{ b.id }}" {% if selected_batch == b.id|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-6 d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-100 fw-bold">Filter</button>
+            <a href="{% url 'students:list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i></a>
+        </div>
+    </form>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Enrolled Students ({{ students.count }})</h5>
+        {% if user.is_superuser or user.profile.role == 'admin' %}
+            <a href="{% url 'students:create' %}" class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm">
+                <i class="bi bi-person-plus-fill me-1"></i> Add New Student
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Student ID</th>
+                    <th>Photo & Name</th>
+                    <th>Roll No</th>
+                    <th>Board / Class</th>
+                    <th>Batch</th>
+                    <th>Contact Phone</th>
+                    <th>Parent Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for st in students %}
+                    <tr>
+                        <td class="fw-bold text-primary">{{ st.student_id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.8rem;">
+                                    {% if st.photo %}
+                                        <img src="{{ st.photo.url }}" class="w-100 h-100 rounded-circle object-fit-cover">
+                                    {% else %}
+                                        {{ st.full_name|make_list|first }}
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ st.full_name }}</div>
+                                    <small class="text-muted">{{ st.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ st.roll_number|default:"-" }}</td>
+                        <td>
+                            <span class="badge {% if st.board == 'CBSE' %}bg-info text-dark{% else %}bg-success{% endif %}">
+                                {{ st.get_board_display }} - Class {{ st.class_level }}
+                            </span>
+                        </td>
+                        <td>{{ st.batch.name|default:"Unassigned" }}</td>
+                        <td><a href="tel:{{ st.phone }}" class="text-decoration-none text-dark">{{ st.phone }}</a></td>
+                        <td><a href="tel:{{ st.parent_phone }}" class="text-decoration-none text-muted small">{{ st.parent_phone }}</a></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'students:detail' st.pk %}" class="btn btn-outline-primary" title="View Profile"><i class="bi bi-eye"></i></a>
+                                {% if user.is_superuser or user.profile.role == 'admin' %}
+                                    <a href="{% url 'students:update' st.pk %}" class="btn btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                    <a href="{% url 'students:delete' st.pk %}" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="8" class="text-center text-muted py-5">No students found matching the selected filters.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

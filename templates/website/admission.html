@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Online Admission Enquiry — NS Classes (CBSE Board){% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="py-5 text-white" style="background: var(--primary-gradient);">
+    <div class="container text-center py-4">
+        <span class="badge bg-warning text-dark px-3 py-2 fw-bold mb-2">ADMISSION OPEN 2026-2027</span>
+        <h1 class="fw-bold mb-2">Apply for Admission</h1>
+        <p class="lead text-light mb-0 mx-auto" style="max-width: 650px;">
+            Take the first step towards academic brilliance with NS Classes for CBSE Board.
+        </p>
+    </div>
+</div>
+
+<div class="container section-padding">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="bg-white p-4 p-md-5 rounded-4 shadow-sm border">
+                <div class="text-center mb-4">
+                    <span class="section-tag">Student Enrollment Form</span>
+                    <h3 class="fw-bold text-dark">Admission Registration Enquiry</h3>
+                    <p class="text-muted small">Please fill out this form accurately. Our academic counseling team will contact you within 24 hours.</p>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Student Full Name *</label>
+                            {{ form.student_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Parent / Guardian Name *</label>
+                            {{ form.parent_name }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Contact Mobile Number *</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email Address (Optional)</label>
+                            {{ form.email }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Education Board *</label>
+                            {{ form.board }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Target Class *</label>
+                            {{ form.class_level }}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Interested Course / Stream</label>
+                            {{ form.interested_course }}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Any Specific Questions or Notes</label>
+                            {{ form.message }}
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold rounded-pill shadow">
+                                <i class="bi bi-check-circle-fill me-2"></i> Submit Admission Enquiry
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="mt-4 pt-3 border-top text-center">
+                    <small class="text-muted">
+                        Need immediate assistance? Contact <strong>Director {{ SITE_DIRECTOR }}</strong> at 
+                        <a href="tel:{{ SITE_PHONE }}" class="text-primary fw-bold">+91 {{ SITE_PHONE }}</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ title }} — NS Classes{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block dashboard_body %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Batch Name *</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Course *</label>
+                        {{ form.course }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Education Board *</label>
+                        {{ form.board }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Class Level *</label>
+                        {{ form.class_level }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Teacher In-Charge</label>
+                        {{ form.teacher }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Start Date *</label>
+                        {{ form.start_date }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">End Date *</label>
+                        {{ form.end_date }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Max Student Capacity *</label>
+                        {{ form.max_students }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Status *</label>
+                        {{ form.status }}
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-semibold">Subjects Taught</label>
+                        {{ form.subjects }}
+                        <small class="text-muted">Hold Ctrl/Cmd to select multiple subjects</small>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-4 border-top mt-4">
+                    <a href="{% url 'batches:list' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary fw-bold rounded-pill px-5 shadow">
+                        <i class="bi bi-save me-2"></i> Save Batch
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

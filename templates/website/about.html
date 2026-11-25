@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us — NS Classes | Directors: {{ SITE_DIRECTOR }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="py-5 text-white" style="background: var(--primary-gradient);">
+    <div class="container text-center py-4">
+        <span class="badge bg-warning text-dark px-3 py-2 fw-bold mb-2">ABOUT NS CLASSES</span>
+        <h1 class="fw-bold mb-2">Excellence in Academic Coaching</h1>
+        <p class="lead text-light mb-0 mx-auto" style="max-width: 650px;">
+            Shaping students from CBSE Board through disciplined methodology, concept clarity, and personal mentorship.
+        </p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container section-padding">
+    <div class="row g-5 align-items-center">
+        <div class="col-lg-6">
+            <span class="section-tag">Our Legacy & Mission</span>
+            <h2 class="section-title">Committed to Quality Education & Board Success</h2>
+            <p class="text-secondary">
+                <strong>NS Classes</strong> is a dedicated educational institute focused on providing quality academic
+                education to students. We provide preparation for <strong>CBSE Board students</strong>. Our objective is
+                to create a strong academic foundation and help students achieve excellent results.
+            </p>
+            <p class="text-secondary">
+                We believe that true learning stems from deep conceptual understanding rather than rote memorization.
+                Under the dedicated direction of <strong>{{ SITE_DIRECTOR }}</strong>, NS Classes provides a disciplined
+                learning environment equipped with comprehensive study materials, chapter-wise problem sets, regular
+                mock tests, and personal doubt removal sessions.
+            </p>
+
+            <div class="row g-3 mt-4">
+                <div class="col-sm-6">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <h6 class="fw-bold text-primary mb-1"><i class="bi bi-bullseye me-2 text-danger"></i>Our Mission
+                        </h6>
+                        <p class="small text-muted mb-0">Empower students of all backgrounds with high-quality education
+                            to top CBSE board exams.</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="p-3 bg-light rounded-3 border">
+                        <h6 class="fw-bold text-primary mb-1"><i class="bi bi-eye-fill me-2 text-success"></i>Our Vision
+                        </h6>
+                        <p class="small text-muted mb-0">To be the most trusted and results-driven academic institute
+                            known for integrity and excellence.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="director-card">
+                <i class="bi bi-quote director-quote-icon"></i>
+                <span class="badge bg-danger mb-3 px-3 py-2">Directors' Message</span>
+                <h3 class="fw-bold text-dark mb-1">Nikhil Kumar Singh &amp; Saurabh Raj</h3>
+                <p class="text-primary fw-semibold small mb-3">Founders &amp; Directors, NS Classes</p>
+
+                <p class="text-secondary fst-italic">
+                    "Welcome to NS Classes. Education is the most powerful tool to transform lives and unlock human
+                    potential. In our coaching institute, we ensure that every student receives the highest standard of
+                    academic training with individualized care."
+                </p>
+                <p class="text-secondary fst-italic">
+                    "Our curriculum is engineered to simplify complex concepts, instill rigorous practice habits, and
+                    boost your exam confidence. We look forward to guiding you on your path to success."
+                </p>
+
+                <div class="pt-3 border-top mt-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted d-block">Directors Helpline</small>
+                        <span class="fw-bold text-dark"><i class="bi bi-telephone-fill text-danger me-1"></i> +91 {{ SITE_PHONE }}</span>
+                    </div>
+                    <a href="{% url 'website:admission' %}"
+                        class="btn btn-warning btn-sm rounded-pill px-3 fw-bold">Enroll with Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ batch.name }} — Batch Details | NS Classes{% endblock %}
+{% block page_title %}{{ batch.name }}{% endblock %}
+{% block page_subtitle %}{{ batch.get_board_display }} • Class {{ batch.class_level }} | Enrolled: {{ batch.current_students }} / {{ batch.max_students }}{% endblock %}
+
+{% block dashboard_body %}
+
+<!-- Batch Overview Top Card -->
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+    <div class="row g-4 align-items-center">
+        <div class="col-md-8">
+            <div class="d-flex flex-wrap gap-2 mb-2">
+                <span class="badge {% if batch.board == 'CBSE' %}bg-primary{% else %}bg-success{% endif %} fs-6 px-3 py-1">
+                    {{ batch.get_board_display }} - Class {{ batch.class_level }}
+                </span>
+                <span class="badge bg-warning text-dark fs-6 px-3 py-1">Status: {{ batch.get_status_display }}</span>
+                <span class="badge bg-secondary fs-6 px-3 py-1">Teacher: {{ batch.teacher.full_name|default:"Unassigned" }}</span>
+            </div>
+            <h4 class="fw-bold text-dark mb-1">{{ batch.name }}</h4>
+            <p class="text-muted small mb-0">Course: <strong>{{ batch.course.name }}</strong> | Duration: {{ batch.start_date|date:"d M Y" }} to {{ batch.end_date|date:"d M Y" }}</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'attendance:mark' %}?batch={{ batch.id }}" class="btn btn-success fw-bold rounded-pill px-4 me-2 shadow-sm">
+                <i class="bi bi-check2-square me-1"></i> Mark Attendance
+            </a>
+            {% if user.is_superuser or user.profile.role == 'admin' %}
+                <a href="{% url 'batches:update' batch.pk %}" class="btn btn-outline-primary rounded-pill px-3">
+                    <i class="bi bi-pencil me-1"></i> Edit Batch
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left: Enrolled Students & Quick Assignment -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-people-fill text-primary me-2"></i>Enrolled Students ({{ students.count }})</h5>
+                <span class="badge {% if batch.is_full %}bg-danger{% else %}bg-success{% endif %}">
+                    {{ batch.current_students }} / {{ batch.max_students }} Capacity
+                </span>
+            </div>
+
+            <!-- Quick Assign Student Form (Admin only) -->
+            {% if user.is_superuser or user.profile.role == 'admin' %}
+                {% if not batch.is_full and available_students %}
+                    <form method="POST" action="{% url 'batches:assign_student' batch.id %}" class="d-flex gap-2 mb-3 p-3 bg-light rounded-3 border">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="assign">
+                        <select name="student_id" class="form-select" required>
+                            <option value="">-- Assign Unallocated Student (Class {{ batch.class_level }}) --</option>
+                            {% for st in available_students %}
+                                <option value="{{ st.id }}">{{ st.full_name }} ({{ st.student_id }})</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary fw-bold text-nowrap"><i class="bi bi-plus-lg me-1"></i> Assign</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Mobile</th>
+                            <th>Roll</th>
+                            {% if user.is_superuser or user.profile.role == 'admin' %}<th>Action</th>{% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for st in students %}
+                            <tr>
+                                <td class="fw-bold">{{ st.student_id }}</td>
+                                <td>
+                                    <a href="{% url 'students:detail' st.pk %}" class="text-decoration-none fw-semibold text-dark">{{ st.full_name }}</a>
+                                </td>
+                                <td>{{ st.phone }}</td>
+                                <td>{{ st.roll_number|default:"-" }}</td>
+                                {% if user.is_superuser or user.profile.role == 'admin' %}
+                                    <td>
+                                        <form method="POST" action="{% url 'batches:assign_student' batch.id %}" class="d-inline" onsubmit="return confirm('Remove student from this batch?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="remove">
+                                            <input type="hidden" name="student_id" value="{{ st.id }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Remove from batch"><i class="bi bi-x-lg"></i></button>
+                                        </form>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted py-4">No students currently enrolled in this batch.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Separate Batch Timetable (Requirement 6) -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-calendar3 text-danger me-2"></i>Batch Timetable</h5>
+                {% if user.is_superuser or user.profile.role == 'admin' %}
+                    <a href="{% url 'timetable:create' %}?batch={{ batch.id }}" class="btn btn-sm btn-outline-danger rounded-pill"><i class="bi bi-plus-circle me-1"></i> Add Slot</a>
+                {% endif %}
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Subject</th>
+                            <th>Teacher</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for slot in timetable_entries %}
+                            <tr>
+                                <td class="fw-bold text-primary">{{ slot.day }}</td>
+                                <td>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ slot.subject.name }}</span></td>
+                                <td>{{ slot.teacher.full_name|default:"Faculty" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-4">No timetable entries set for this batch yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

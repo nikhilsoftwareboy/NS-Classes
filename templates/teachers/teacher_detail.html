@@ -1,0 +1,90 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}{{ teacher.full_name }} — Faculty Profile{% endblock %}
+{% block page_title %}{{ teacher.full_name }}{% endblock %}
+{% block page_subtitle %}Teacher ID: {{ teacher.teacher_id }}{% endblock %}
+
+{% block dashboard_body %}
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center mb-4">
+            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-1 mx-auto mb-3 shadow" style="width: 100px; height: 100px;">
+                {% if teacher.photo %}
+                    <img src="{{ teacher.photo.url }}" class="w-100 h-100 rounded-circle object-fit-cover">
+                {% else %}
+                    {{ teacher.full_name|make_list|first }}
+                {% endif %}
+            </div>
+            <h4 class="fw-bold mb-1">{{ teacher.full_name }}</h4>
+            <span class="badge bg-danger px-3 py-1 mb-2">{{ teacher.teacher_id }}</span>
+            <p class="text-primary fw-semibold small mb-2">{{ teacher.qualification }}</p>
+            <div class="text-muted small mb-3"><i class="bi bi-briefcase-fill text-warning me-1"></i> {{ teacher.experience }}+ Years Experience</div>
+
+            <div class="d-flex justify-content-center gap-2 pt-3 border-top">
+                <a href="{% url 'teachers:update' teacher.pk %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                    <i class="bi bi-pencil me-1"></i> Edit Profile
+                </a>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <h5 class="fw-bold text-dark mb-3">Contact Details</h5>
+            <ul class="list-group list-group-flush small">
+                <li class="list-group-item d-flex justify-content-between px-0"><span>Phone:</span> <strong>{{ teacher.phone }}</strong></li>
+                <li class="list-group-item d-flex justify-content-between px-0"><span>Email:</span> <strong>{{ teacher.email }}</strong></li>
+                <li class="list-group-item d-flex justify-content-between px-0"><span>Joining Date:</span> <strong>{{ teacher.joining_date|date:"d M Y" }}</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-collection text-primary me-2"></i>Assigned Batches</h5>
+            <div class="row g-3">
+                {% for b in assigned_batches %}
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <h6 class="fw-bold mb-1 text-dark">{{ b.name }}</h6>
+                            <small class="text-muted d-block">{{ b.get_board_display }} • Class {{ b.class_level }}</small>
+                            <span class="badge bg-primary mt-2">{{ b.current_students }} / {{ b.max_students }} Enrolled</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted small">No batches assigned yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar-week text-danger me-2"></i>Weekly Timetable</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle small mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Subject</th>
+                            <th>Batch</th>
+                            <th>Room</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for slot in timetable_entries %}
+                            <tr>
+                                <td class="fw-bold text-primary">{{ slot.day }}</td>
+                                <td>{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ slot.subject.name }}</span></td>
+                                <td>{{ slot.batch.name }}</td>
+                                <td>{{ slot.room|default:"Room 1" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted py-3">No timetable entries assigned to this faculty.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
