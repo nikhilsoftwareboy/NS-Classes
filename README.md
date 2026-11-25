@@ -177,7 +177,7 @@ Open your browser and navigate to:
 
 ## 🛡 Security & Best Practices
 
-- **CSRF Protection:** Enabled on all forms with `{% csrf_token %}`.
+- **CSRF Protection:** Enabled on all forms with Django's {% raw %}`{% csrf_token %}`{% endraw %}.
 - **Authorization:** `login_required` decorators and role verification preventing unauthorized access or cross-student record visibility.
 - **Password Security:** Django PBKDF2 with SHA256 password hashing.
 - **Data Integrity:** Foreign key constraints, cascade protections, and unique attendance record constraints `['student', 'date', 'batch']`.
